@@ -1,0 +1,38 @@
+{
+  "name": "inventory-software",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.0.1",
+    "@radix-ui/react-collapsible": "^1.1.1",
+    "bcryptjs": "^3.0.2",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "jose": "^6.0.10",
+    "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.459.0",
+    "next": "15.0.3",
+    "react": "19.0.0-rc-66855b96-20241106",
+    "react-dom": "19.0.0-rc-66855b96-20241106",
+    "react-hook-form": "^7.53.2",
+    "react-hot-toast": "^2.4.1",
+    "server-only": "^0.0.1",
+    "tailwind-merge": "^2.5.4",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.9",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "prisma": "^6.0.1",
+    "sass": "^1.69.7",
+    "sass-loader": "^13.3.3",
+    "tailwindcss": "^3.4.1"
+  }
+}
