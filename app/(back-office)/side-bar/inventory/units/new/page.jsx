@@ -1,44 +1,54 @@
 "use client"
 
+import FormHeader from '@/components/dashboard/FormHeader'
 import SubmitButton from '@/components/FormInputs/SubmitButton'
 import TextInput from '@/components/FormInputs/TextInput'
-import { makePostRequest } from '@/lib/apiRequest'
-import { X } from 'lucide-react'
-import Link from 'next/link'
+import { makePostRequest, makePutRequest } from '@/lib/apiRequest'
+import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-export default function NewUnit() {
+export default function NewUnit({initialData={}, isUpdate=false}) {
+  const router =useRouter()
   const {
     register,
     handleSubmit,
     reset,
-    watch,
     formState: { errors },
   } = useForm({
-    //defaultValues: 
-    //{
-    //  title: '',
-   //   abbreviation: ''
-  //  }
+    defaultValues: initialData
 });
   const [loading, setLoading ] =useState(false);
+
+  
+  function redirect(){
+    router.replace("/side-bar/inventory/units/")
+  }
+  
+
   async function onSubmit(data) 
   {
-    console.log(data )
-    setLoading(true)
-    const baseUrl ="http://localhost:3000"
-    makePostRequest( setLoading, `${baseUrl}/api/units`, data, "unit", reset)
+
+    if(isUpdate){
+        //update request
+        const baseUrl ="http://localhost:3000"
+        makePutRequest( setLoading, `${baseUrl}/api/units/${initialData.id}`, data, "unit", 
+          redirect, reset)
+    }else{
+        setLoading(true)
+        const baseUrl ="http://localhost:3000"
+        makePostRequest( setLoading, `${baseUrl}/api/units`, data, "unit", reset)
+    }
+    
   }
   return (
     <div>
         {/**header */}
-        <div className="flex items-center justify-between py-3 px-16 bg-white">
-          <h2 className='text-xl font-semibold'> New Unit</h2>
-          <Link href="/side-bar/inventory/">
-            <X/>
-          </Link>
-        </div>
+
+        <FormHeader title={isUpdate?"Update Unit": "New Unit"} 
+            href= "/side-bar/inventory/units"/>
+        {/**Form */}
+
         {/**Form */}
         
         <form onSubmit={
@@ -49,8 +59,8 @@ export default function NewUnit() {
           <div className='grid gap-4 sm:grid-cols-2 sm:gap-6'>
           <TextInput name ="title" label="Unit title"  register={register} errors={errors} containerWidth='w-full'/>
           <TextInput name= "abbreviation" label="Abbreviation" register={register} errors={errors} containerWidth='w-full'/>
-          <SubmitButton isLoading={loading} title="Unit"/>
-
+          <SubmitButton isLoading={loading} title={isUpdate?"Update Unit": "New Unit"}/>
+          
           </div>
         </form>
         {/**buttons */}

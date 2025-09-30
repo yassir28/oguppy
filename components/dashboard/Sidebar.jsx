@@ -1,33 +1,47 @@
 "use client"
 
-import { ChevronLeft, ShoppingCart, Home, BaggageClaim, ShoppingBag, ShoppingBasket, Cable, BarChart3, Files } from 'lucide-react'
+import { ChevronLeft, ShoppingCart, Home, BaggageClaim, ShoppingBag, ShoppingBasket, Cable, BarChart3, Files, X } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 import SubscriptionCard from './SubscriptionCard'
 import CollapsibleLink from './CollapsibleLink'
+import SideDropDownLink from './SidebarDropdownLink'
 
-export default function Sidebar() {
+export default function Sidebar({showSidebar, setShowSidebar}) {
     const inventoryLinks =[
         {
-            title:"Items",
+            title:"All",
             href:"/side-bar/inventory"
+        },        
+        {
+            title:"Items",
+            href:"/side-bar/inventory/items"
         },
         {
             title:"categories",
-            href:"/side-bar/inventory"
+            href:"/side-bar/inventory/categories"
         },
         {
             title:"brands",
-            href:"/side-bar/inventory"
+            href:"/side-bar/inventory/brands"
         },
         {
             title:"units",
-            href:"/side-bar/inventory"
+            href:"/side-bar/inventory/units"
         },
         {
             title:"warehouse",
-            href:"/side-bar/inventory"
-        }
+            href:"/side-bar/inventory/warehouse"
+        },
+                
+        {
+            title:"adjustments",
+            href:"/side-bar/inventory/adjustments"
+        },
+        {
+            title:"suppliers",
+            href:"/side-bar/inventory/suppliers"
+        }        
     ]
     const salesLinks =[
         {
@@ -68,27 +82,35 @@ export default function Sidebar() {
         },                
     ]
   return (
-    <div 
-        className="w-60 min-h-screen bg-slate-800 text-slate-50 fixed"> {/*flex flex-col justify-between"> */}
+    <div className={`${showSidebar? "w-60 min-h-screen bg-slate-800 text-slate-50 fixed lg:block z-50 ":
+         "w-60 min-h-screen bg-slate-800 text-slate-50 hidden fixed lg:block z-50 "}`}>
+
             {/* Top Part */}
                 <div className="flex flex-col">
                     {/* Logo */}
-                    <Link href="#" className="bg-slate-700 flex space-x-2 items-center py-4 px-2">
-                         <ShoppingCart/>
-                        <span className='text-x1 font-semibold'>Inventory</span>
-                    </Link>
+                    <div className="flex justify-between">
+                        <Link href="#" className="bg-slate-950 flex space-x-2 items-center py-3 px-2 w-full">
+                            <ShoppingCart/>
+                            <span className='text-xl font-semibold'>Inventory</span>
+                        </Link>
+                        <button className="bg-slate-950 y-3 px-4 " onClick={()=> setShowSidebar(false)}>
+                            <X className='h-6 w-6 text-white'/>
+                        </button>
+                    </div>
                     {/* Links */}
                     <nav className='flex flex-col  gap-3 px-3 py-6'>
-                        <Link className='flex items-center space-x-2 bg-blue-600 text-slate-50 p-2 rounded-md' href="#">
+                        <Link className='flex items-center space-x-2 bg-blue-600 text-slate-50 p-2 rounded-md'
+                                 href="/side-bar/home/dashboard">
                             <Home className='w-4 h-4'/>
                             <span>Home</span>
                         </Link>
 
-                        <CollapsibleLink title="Inventory" items={inventoryLinks} icon = {BaggageClaim} />
+                        <SideDropDownLink title="Inventory" items={inventoryLinks} 
+                        icon = {BaggageClaim} setShowSidebar={setShowSidebar}/>
 
-                        <CollapsibleLink title="Sales" items={salesLinks} icon = {ShoppingBag} />
+                        <SideDropDownLink title="Sales" items={salesLinks} icon = {ShoppingBag} />
 
-                        <CollapsibleLink title="Purchases" items={inventoryLinks} icon = {ShoppingBasket} />
+                        <SideDropDownLink title="Purchases" items={inventoryLinks} icon = {ShoppingBasket} />
 
 
                         <Link className='flex items-center space-x-2 p-2' href="#">

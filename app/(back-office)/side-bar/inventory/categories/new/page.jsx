@@ -1,40 +1,54 @@
 "use client"
 
+import FormHeader from '@/components/dashboard/FormHeader'
 import SubmitButton from '@/components/FormInputs/SubmitButton'
 import TextareaInput from '@/components/FormInputs/TextareaInput'
 import TextInput from '@/components/FormInputs/TextInput'
-import { makePostRequest } from '@/lib/apiRequest'
+import { makePostRequest, makePutRequest } from '@/lib/apiRequest'
 import { Plus, X } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-export default function NewCategory() {
+export default function NewCategory({initialData={}, isUpdate=false}) {
+  const router =useRouter()
   const {
     register,
     handleSubmit,
     reset,
-    watch,
     formState: { errors },
-  } = useForm();
+  } = useForm(
+        {defaultValues: initialData}
+  );
   const [loading, setLoading ] =useState(false);
+
+  function redirect(){
+    router.replace("/side-bar/inventory/categories/")
+  }
+
   async function onSubmit(data) {
-    console.log(data )
-    setLoading(true)
-    const baseUrl ="http://localhost:3000"
-    makePostRequest( setLoading, `${baseUrl}/api/categories`, data, "category", reset)
+    if(isUpdate){
+        //update request
+        const baseUrl ="http://localhost:3000"
+        makePutRequest( setLoading, `${baseUrl}/api/categories/${initialData.id}`, data, "Category", 
+          redirect, reset)
+    }else{
+        setLoading(true)
+        const baseUrl ="http://localhost:3000"
+        makePostRequest( setLoading, `${baseUrl}/api/categories`, data, "category", reset)
+    }
   }
 
   return (
     <div>
         {/**header */}
-        <div className="flex items-center justify-between py-3 px-16 bg-white">
-          <h2 className='text-xl font-semibold'> New Category</h2>
-          <Link href="/side-bar/inventory/">
-            <X/>
-          </Link>
-        </div>
+
+        <FormHeader title={isUpdate?"Update Category": "New Category"} 
+            href= "/side-bar/inventory/categories"/>
+
+        
         {/**Form */}
         
         <form onSubmit={
@@ -45,7 +59,8 @@ export default function NewCategory() {
 
           <TextInput label="Category Title" name ="title" register={register} errors={errors}/>
           <TextareaInput name= "description" label="Description" register={register} errors={errors}/>
-          <SubmitButton isLoading={loading} title="Category"/>
+          <SubmitButton isLoading={loading} title={isUpdate?"Update Category": "New Category"}/>
+
         </form>
         {/**buttons */}
     </div>

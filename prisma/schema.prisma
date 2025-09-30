@@ -13,25 +13,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// level 1 authentication
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String?
-  role      String   @default("user")
-  tokens    Token[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String     @id @default(uuid())
+  name           String?
+  email          String?    @unique
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
 }
 
-model Token {
-  id        String   @id @default(cuid())
-  token     String   @unique
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expires   DateTime
-  createdAt DateTime @default(now())
-}
+//model User {
+//  id        String   @id @default(cuid())
+//  email     String   @unique
+//  password  String
+//  name      String?
+//  role      String   @default("user")
+//  tokens    Token[]
+//  createdAt DateTime @default(now())
+//  updatedAt DateTime @updatedAt
+//}
+//
+//model Token {
+//  id        String   @id @default(cuid())
+//  token     String   @unique
+//  userId    String
+//  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+//  expires   DateTime
+//  createdAt DateTime @default(now())
+//}
 
 
 model Item {
@@ -43,19 +55,25 @@ model Item {
   sku         String    @unique
   barcode     String?
   quantity    Int
-  unit        Unit      @relation(fields: [unitId], references: [id])
+  unit        Unit      @relation(fields: [unitId], references: [id], onDelete: Cascade)
   unitId      String    
-  brand       Brand     @relation(fields: [brandId], references: [id])
-  brandId     String    
+  brand       Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  brandId     String 
+  warehouse       Warehouse     @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  warehouseId     String    
   sellingPrice  Float
-  buyingPrice   Float
+  supplier       Supplier     @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  supplierId String  
   reOrderPoint  Int
   location      String?
-  imageUrl      String
+  imageUrl      String?
   weight        Float?
   dimensions    String?
   taxRate       Float
   notes         String?
+  addStockAdjustment AddStockAdjustment[]  // Add this line to create the opposite relation
+  transferStockAdjustment TransferStockAdjustment[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -95,8 +113,55 @@ model Warehouse {
   location String?
   description String?
   warehouseType String
+  stockQty Int @default(0)
+  items Item[]  // Add this line to create the opposite relation
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
 }
 
+model AddStockAdjustment {
+  id String @id @default(uuid())
+  referenceNumber String
+  addStockQty Int
+  notes String?
+  receivingWarehouseId String
+  item       Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId String
+  supplier       Supplier     @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  supplierId String  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+
+}
+
+model TransferStockAdjustment {
+  id String @id @default(uuid())
+  referenceNumber String
+  transferStockQty Int
+  notes String?
+  givingWarehouseId String
+  receivingWarehouseId String
+  item       Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Supplier {
+  id String @id @default(uuid())
+  title String
+  phone String?
+  email String?
+  address String?
+  contactPerson String?
+  supplierCode String @unique
+  paymentTerms String?
+  taxId String?
+  notes String?
+  Item     Item[]
+  addStockAdjustment    AddStockAdjustment[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

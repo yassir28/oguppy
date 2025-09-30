@@ -25,3 +25,46 @@ export async function POST(request) {
         })
     }
 }
+
+
+export async function GET(request) {
+    try{
+        const units =await prisma.unit.findMany({
+            orderBy: {
+                createdAt: 'desc'
+            },
+        });
+        return NextResponse.json(units)
+    }
+    catch (error){
+        console.log(error)
+        return NextResponse.json({
+            error,
+            message:"Failed to Fetch a unit"
+        },{
+            status:500
+        })
+    }
+}
+
+
+export async function DELETE(request) {
+    try{
+        const id = request.nextUrl.searchParams.get("id")
+        const  deleteUnit = await prisma.unit.delete({
+        where:{
+                id
+            }
+       });        
+        return NextResponse.json(deleteUnit)
+    }
+    catch (error){
+        console.log(error)
+        return NextResponse.json({
+            error,
+            message:"Failed to delete the unit"
+        },{
+            status:500
+        })
+    }
+}

@@ -4,7 +4,7 @@ import React from 'react'
 export default function SubmitButton({isLoading, title}) {
   return (
     <div>
-                  <div className="sm:col-span-1">
+        <div className="sm:col-span-1">
             {isLoading ? (
               <button
                 disabled
@@ -39,7 +39,7 @@ export default function SubmitButton({isLoading, title}) {
                 <span>Save {title}</span>
               </button>
             )}
-          </div>
+        </div>
 
     </div>
   )

@@ -1,7 +1,7 @@
 "use client"
 import FixedHeader from '@/components/dashboard/FixedHeader'
 import OptionCard from '@/components/dashboard/OptionCard'
-import { Award, Boxes, ScrollText, Shirt, ShirtIcon } from 'lucide-react'
+import { Award, Boxes, Home, Plus, ScrollText, Shirt, ShirtIcon, Warehouse } from 'lucide-react'
 import React from 'react'
 
 export default function inventory() {
@@ -33,28 +33,36 @@ export default function inventory() {
       },
       {
         title: "Brands",
-        description: "Tweak prices for perfect transactions",
+        description: "Select the Brand for your Items",
         link: "/side-bar/inventory/brands/new",
-        linkTitle:"New Item",
+        linkTitle:"New Brand",
         enabled: true,
         icon: Award
       },
       {
         title: "Warehouse",
-        description: "Tweak prices for perfect transactions",
+        description: "Define your Stock Warehouses",
         link: "/side-bar/inventory/warehouse/new",
-        linkTitle:"New Item",
+        linkTitle:"New Warehouse",
         enabled: true,
-        icon: Award
+        icon: Warehouse
       },
       {
         title: "Adjustments",
-        description: "Tweak prices for perfect transactions",
+        description: "Tweak Adjustments for perfect Stock",
         link: "/side-bar/inventory/adjustments/new",
-        linkTitle:"New Item",
+        linkTitle:"New Adjustment",
         enabled: true,
-        icon: Award
-      }
+        icon: Plus
+      },
+      {
+        title: "Suppliers",
+        description: "Define your Suppliers for your Stock amunition",
+        link: "/side-bar/inventory/suppliers/new",
+        linkTitle:"New Supplier",
+        enabled: true,
+        icon: Home
+      }      
   ]
 
   return (

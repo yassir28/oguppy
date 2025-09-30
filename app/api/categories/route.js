@@ -27,3 +27,48 @@ export async function POST(request) {
 }
 
 
+
+export async function GET(request) {
+    try{
+        const categories =await prisma.category.findMany({
+            orderBy: {
+                createdAt: 'desc'
+            },
+        });
+        return NextResponse.json(categories)
+    }
+    catch (error){
+        console.log(error)
+        return NextResponse.json({
+            error,
+            message:"Failed to Fetch a category"
+        },{
+            status:500
+        })
+    }
+}
+
+
+
+
+
+export async function DELETE(request) {
+    try{
+        const id = request.nextUrl.searchParams.get("id")
+        const  deleteCategory = await prisma.category.delete({
+        where:{
+                id
+            }
+       });        
+        return NextResponse.json(deleteCategory)
+    }
+    catch (error){
+        console.log(error)
+        return NextResponse.json({
+            error,
+            message:"Failed to delete the category"
+        },{
+            status:500
+        })
+    }
+}

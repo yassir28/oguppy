@@ -31,10 +31,15 @@ export async function POST(request) {
 export async function GET(request) {
     try{
         const warehouse =await prisma.warehouse.findMany({
+            
             orderBy: {
                 createdAt: 'desc'
             },
+            include:{
+                items:true
+            }
         });
+       
         return NextResponse.json(warehouse)
     }
     catch (error){
@@ -42,6 +47,33 @@ export async function GET(request) {
         return NextResponse.json({
             error,
             message:"Failed to Fetch a warehouse"
+        },{
+            status:500
+        })
+    }
+}
+
+
+
+
+export async function DELETE(request) {
+    try{
+        const id = request.nextUrl.searchParams.get("id")
+        const  deleteWarehouse = await prisma.warehouse.delete({
+        where:{
+                id
+            },
+        //  iclude:{
+        //      item:true
+          // }
+       });        
+        return NextResponse.json(deleteWarehouse)
+    }
+    catch (error){
+        console.log(error)
+        return NextResponse.json({
+            error,
+            message:"Failed to delete the warehouse"
         },{
             status:500
         })

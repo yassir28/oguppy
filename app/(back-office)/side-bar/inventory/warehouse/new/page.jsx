@@ -1,51 +1,61 @@
 "use client"
 
+import FormHeader from '@/components/dashboard/FormHeader'
 import SelectInput from '@/components/FormInputs/SelectInput'
 import SubmitButton from '@/components/FormInputs/SubmitButton'
 import TextareaInput from '@/components/FormInputs/TextareaInput'
 import TextInput from '@/components/FormInputs/TextInput'
-import { makePostRequest } from '@/lib/apiRequest'
+import { makePostRequest, makePutRequest } from '@/lib/apiRequest'
 import { Plus, X } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
 
-export default function NewWarehouse() {
+export default function NewWarehouse({initialData={}, isUpdate=false}) {
+  const router =useRouter()
   const selectOptions = [
     {
-      label:"Main",
-      value:"main"
+      title:"Main",
+      id:"main"
     },
     {
-      label:"Branch",
-      value:"branch"
+      title:"Branch",
+      id:"branch"
     }
   ]
   const {
     register,
     handleSubmit,
     reset,
-    watch,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: initialData
+  });
   const [loading, setLoading ] =useState(false);
+    function redirect(){
+    router.replace("/side-bar/inventory/warehouse/")
+  }
+  
   async function onSubmit(data) {
-    console.log(data )
-    setLoading(true)
-    const baseUrl ="http://localhost:3000"
-    makePostRequest( setLoading, `${baseUrl}/api/warehouse`, data, "warehouse", reset)
+      if(isUpdate){
+          //update request
+          const baseUrl ="http://localhost:3000"
+          makePutRequest( setLoading, `${baseUrl}/api/warehouse/${initialData.id}`, data, "Warehouse", 
+            redirect, reset)
+      }else{    
+          console.log(data )
+          setLoading(true)
+          const baseUrl ="http://localhost:3000"
+          makePostRequest( setLoading, `${baseUrl}/api/warehouse`, data, "warehouse", reset)
+    }
   }
 
   return (
     <div>
         {/**header */}
-        <div className="flex items-center justify-between py-3 px-16 bg-white">
-          <h2 className='text-xl font-semibold'> New Warehouse</h2>
-          <Link href="/side-bar/inventory/">
-            <X/>
-          </Link>
-        </div>
+        <FormHeader title={isUpdate?"Update Warehouse": "New Warehouse"} 
+            href= "/side-bar/inventory/warehouse"/>        
         {/**Form */}
         
         <form onSubmit={
@@ -58,7 +68,7 @@ export default function NewWarehouse() {
             <TextInput label="Warehouse Title" name ="title" register={register} errors={errors} containerWidth='w-full'/>
             <TextInput label="Warehouse Location" name ="location" register={register} errors={errors} containerWidth='w-full'/>
             <TextareaInput name= "Description" label="Description" register={register} errors={errors}/>
-            <SubmitButton isLoading={loading} title="Warehouse"/>
+            <SubmitButton isLoading={loading} title={isUpdate?"Update Warehouse": "New Warehouse"}/>
         </form>
         {/**buttons */}
     </div>

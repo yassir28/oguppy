@@ -1,28 +1,40 @@
 
 
 import CreateItemForm from '@/components/dashboard/CreateItemForm'
+import FormHeader from '@/components/dashboard/FormHeader'
 import { getData } from '@/lib/getData'
 import {  X } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
-export default async function NewItem({}) {
-  const categories = await  getData("categories")   ;
-  const units = await  getData("units")  ;
-  const brands = await  getData("brands")  ;
-  const warehouses = await  getData("warehouse")  ;
+export default async function NewItem({initialData={}, isUpdate=false}) {
+
+  // sequential fetching => they wait for another.
+  // const categoriesData = await  getData("categories")   ;
+  // const unitsData = await  getData("units")  ;
+  // const brandsData = await  getData("brands")  ;
+  // const warehousesData = await  getData("warehouse")  ;
  
+
+// parallel fetching
+  const categoriesData =   getData("categories")   ;
+  const unitsData =   getData("units")  ;
+  const brandsData =   getData("brands")  ;
+  const warehousesData =   getData("warehouse")  ;
+  const suppliersData =   getData("suppliers")  ;
+
+  const [categories, units, brands, warehouses, suppliers] = await 
+  Promise.all([categoriesData, unitsData, brandsData, warehousesData, suppliersData])     ;
+
+
   return (
     <div>
         {/**header */}
-        <div className="flex items-center justify-between py-3 px-16 bg-white">
-          <h2 className='text-xl font-semibold'> New Item</h2>
-          <Link href="/side-bar/inventory/">
-            <X/>
-          </Link>
-        </div>
+        <FormHeader title={isUpdate?"Update Item": "New Item"} 
+                    href= "/side-bar/inventory/items"/>
+        
         {/**Form */}  
-        <CreateItemForm categories={categories} units={units} brands={brands} warehouses={warehouses}/>
+        <CreateItemForm categories={categories} units={units} brands={brands} suppliers={suppliers} warehouses={warehouses} initialData={initialData} isUpdate={isUpdate} />
         {/**buttons */}
     </div>
   )
