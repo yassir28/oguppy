@@ -1,10 +1,17 @@
+"use client"
 import {  Pencil } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 import DeleteBtn from './DeleteBtn'
 
+import { useRole } from '@/lib/hooks/useRole'
+
+
 export default function DataTable({data= [], columns = [], resourceTitle}) {
-  return (
+    // Get user role information
+  const { isAdmin } = useRole();
+
+    return (
 
 
 <div className="relative overflow-x-auto shadow-md sm:rounded-lg m-2">
@@ -21,7 +28,13 @@ export default function DataTable({data= [], columns = [], resourceTitle}) {
                         </th>
                     )
                 })}
-               
+              {/* Actions Column - Only show if user is ADMIN */}
+              {isAdmin && (
+                <th scope="col" className="px-6 py-3">
+                  Actions
+                </th>
+              )}
+
             </tr>
         </thead>
         <tbody>
@@ -32,14 +45,6 @@ export default function DataTable({data= [], columns = [], resourceTitle}) {
                                             dark:border-gray-700 border-gray-200 
                                             hover:bg-gray-50 dark:hover:bg-gray-600">
                     
-                {/* {columns.map((columnName,i) => {
-                        return (
-                            <td key={i} className="px-6 py-4">
-                                {item[columnName]}
-                            </td>
-                        )
-                    })}*/}
-
 
                     {columns.map((columnName, i) => (
                     <td key={i} className="px-6 py-4">
@@ -67,6 +72,8 @@ export default function DataTable({data= [], columns = [], resourceTitle}) {
 
 
 
+                  {/* Actions Column - Only show if user is ADMIN */}
+                  {isAdmin && (
 
                     <td className="px-6 py-4 text-right flex items-center  space-x-4">
                         {
@@ -84,6 +91,7 @@ export default function DataTable({data= [], columns = [], resourceTitle}) {
                         }
                         <DeleteBtn id={item.id}  endpoint={resourceTitle} />
                     </td>
+                )}
                 </tr>
                 )
             })}

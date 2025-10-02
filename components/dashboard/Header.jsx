@@ -15,9 +15,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import Link from 'next/link'
 
 
-export default function Header({setShowSidebar}) {
+
+export default function Header({setShowSidebar, showSidebar}) {
     const {data:session, status}= useSession()
     const router = useRouter()
     if (status==="loading"){
@@ -31,9 +33,12 @@ export default function Header({setShowSidebar}) {
     return(
     <div className='bg-gray-100 h-12 flex items-center justify-between 
                     px-8 border-b border-slate-200 '>
-        <button className=' lg:hidden' onClick={ ()=>setShowSidebar(true)  }>
-          <AlignJustify className='w-6 h-6'/>
-        </button> 
+        {/* Hamburger menu - shows only when sidebar is hidden */}
+        {!showSidebar && (
+          <button onClick={() => setShowSidebar(true)}>
+            <AlignJustify className='w-6 h-6'/>
+          </button>
+        )} 
         <div className='flex gap-3'>
           {/* Recent activities*/}
           <button className='hidden lg:block'>
@@ -75,14 +80,26 @@ export default function Header({setShowSidebar}) {
               <DropdownMenuContent>
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
+               
+                {/* Settings - Admin Only */}
+                {session.user?.role === "ADMIN" && (
+                  <DropdownMenuItem>
+                    <Link href="/side-bar/settings">Settings</Link>
+                  </DropdownMenuItem>
+                )}
+
                 <DropdownMenuItem>
                   <button onClick={()=> signOut()}> Logout</button>
                 </DropdownMenuItem>
+                <DropdownMenuItem>Profile</DropdownMenuItem>
                 <DropdownMenuItem>Billing</DropdownMenuItem>
                 <DropdownMenuItem>Team</DropdownMenuItem>
                 <DropdownMenuItem>Subscription</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+
+
 
             <button >
                 {session.user?.image?(

@@ -10,14 +10,14 @@ import React from 'react'
 export default function HomeNavbar() {
 
     const {data:session, status}= useSession()
+    const pathname = usePathname();
+
     if (status==="loading"){
       return <p>Loading User..</p>
     }
 
     const username =session?.user?.name.toUpperCase();    
 
-    const pathname = usePathname();
-    console.log(pathname);
     const navLinks =[
         {
             title:"Dashboard",

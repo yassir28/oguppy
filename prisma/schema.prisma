@@ -13,6 +13,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Enum for user roles - defines the available roles in the system
+enum UserRole {
+  USER            // Regular user - view-only access
+  ITEM_MANAGER    // Can manage items only
+  BRAND_MANAGER   // Can manage brands and categories only
+  ADMIN           // Full access to everything
+  
+}
+
+
 // level 1 authentication
 model User {
   id             String     @id @default(uuid())
@@ -21,29 +31,15 @@ model User {
   emailVerified  DateTime?
   image          String?
   hashedPassword String?
+  role           UserRole  @default(USER)
+  // OTP Email Verification fields
+  verificationToken   String?   // Store the 6-digit OTP
+  tokenExpiry         DateTime? // When the OTP expires (10 minutes)
+
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 }
 
-//model User {
-//  id        String   @id @default(cuid())
-//  email     String   @unique
-//  password  String
-//  name      String?
-//  role      String   @default("user")
-//  tokens    Token[]
-//  createdAt DateTime @default(now())
-//  updatedAt DateTime @updatedAt
-//}
-//
-//model Token {
-//  id        String   @id @default(cuid())
-//  token     String   @unique
-//  userId    String
-//  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-//  expires   DateTime
-//  createdAt DateTime @default(now())
-//}
 
 
 model Item {

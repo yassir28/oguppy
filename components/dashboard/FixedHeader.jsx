@@ -1,18 +1,30 @@
+"use client"
+
+import { useRole } from '@/lib/hooks/useRole';
 import { HelpCircle, LayoutGrid, List, MoreHorizontal, Plus } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
 export default function FixedHeader({newLink, title}) {
+    // Get user role information
+  const { isAdmin } = useRole();
+
   return (
     <div className='flex justify-between items-center bg-gray-200 py-5 px-4'>
         <button className='text-2xl'> {title}</button>
         <div className="flex gap-4">
-          {/**New */}
-          <Link href={newLink} className="p-1 rounded-sm bg-blue-600 flex items-center space-x-2 px-3 text-white
-                  ">
-              <Plus className='w-4 h-4'/>
-              <span> New</span>
-          </Link>
+            {/* New Button - Only show to ADMIN users */}
+            {isAdmin && (
+              <Link 
+                href={newLink} 
+                className="p-1 rounded-sm bg-blue-600 flex items-center space-x-2 px-3 text-white"
+              >
+                <Plus className='w-4 h-4'/>
+                <span>New</span>
+              </Link>
+            )}
+
+
           {/**layout */}
           <div className="flex rounded-sm overflow-hidden">
             <button className=' border-r border-gray-400 bg-gray-400 p-2'>

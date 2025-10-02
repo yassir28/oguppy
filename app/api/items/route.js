@@ -1,8 +1,16 @@
+import { requireAdmin, requireAuth } from "@/lib/auth/apiAuthMiddleware";
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 
 export async function POST(request) {
+
+    // Check if user is authenticated and is an ADMIN
+    const { session, error } = await requireAdmin(request);
+
+    // If there's an error (not authenticated or not admin), return it
+    if (error) return error;
+
     try{
 
         const body = await request.json();
@@ -44,18 +52,15 @@ export async function POST(request) {
             });
         }
         
-        // current stock of the warehouse 
+        // Update warehouse stock quantity
         const currentWarehouseStock = warehouse.stockQty;
-        const newStockQty = parseInt(currentWarehouseStock) +parseInt(qty)
-        // Update the stock on the warehouse
-        const updatedWarehouse = await prisma.warehouse.update({
-            where: {
-                id: warehouseId
-            },
-            data: {
-                stockQty:newStockQty
-            }
-        })
+        const newStockQty = parseInt(currentWarehouseStock) + parseInt(qty);
+        
+        await prisma.warehouse.update({
+        where: { id: warehouseId },
+        data: { stockQty: newStockQty }
+        });
+
 
         const  item = await prisma.item.create({
         data:{
@@ -79,7 +84,7 @@ export async function POST(request) {
             }
        });
 
-
+        console.log(`Item created by ADMIN: ${session.user.email}`);
         return NextResponse.json(item)
     }
     catch (error){     
@@ -98,7 +103,16 @@ export async function POST(request) {
 
 
 
+/**
+ * GET - Fetch all items
+ * Protected: Any authenticated user can view items
+ */
 export async function GET(request) {
+    // Check if user is authenticated (both USER and ADMIN can view)
+    const { session, error } = await requireAuth(request);
+  
+    if (error) return error;
+
     try {
         const items = await prisma.item.findMany({
             orderBy: {
@@ -128,8 +142,16 @@ export async function GET(request) {
 
 
 
+/**
+ * DELETE - Delete an item
+ * Protected: Only ADMIN can delete items
+ */
 
 export async function DELETE(request) {
+    // Check if user is authenticated and is an ADMIN
+    const { session, error } = await requireAdmin(request);
+    
+    if (error) return error;    
     try {
         const id = request.nextUrl.searchParams.get("id");
         
@@ -142,7 +164,13 @@ export async function DELETE(request) {
             }
         });
 
-
+        if (!itemToDelete) {
+        return NextResponse.json({
+            message: "Item not found"
+        }, {
+            status: 404
+        });
+        }
         // Delete the item
         const deletedItem = await prisma.item.delete({
             where: { id }
@@ -157,6 +185,7 @@ export async function DELETE(request) {
                 }
             }
         });
+    console.log(`Item deleted by ADMIN: ${session.user.email}`);
 
         return NextResponse.json(deletedItem);
     }
