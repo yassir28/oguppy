@@ -59,7 +59,7 @@ export default function UserManagementTable({ users: initialUsers }) {
     setLoading(true);
     
     try {
-      const response = await fetch(`/api/users/${userId}`, {
+      const response = await fetch(`/api/auth/register/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -98,7 +98,7 @@ export default function UserManagementTable({ users: initialUsers }) {
     setLoading(true);
 
     try {
-      const response = await fetch(`/api/users/${userId}`, {
+      const response = await fetch(`/auth/register/${userId}`, {
         method: "DELETE",
       });
 

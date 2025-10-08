@@ -22,8 +22,23 @@ export default function LoginForm() {
         ...data,
         redirect: false,
       });
-      if (loginData) {
+      
+      if (loginData?.error) {
         setLoading(false);
+        
+        // Check if error is about email verification
+        if (loginData.error.includes("verify your email")) {
+          toast.error("Please verify your email first");
+          // Redirect to verification page
+          setTimeout(() => {
+            router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
+          }, 1500);
+        } else {
+          toast.error("Invalid email or password");
+        }
+      } else if (loginData?.ok) {
+        setLoading(false);
+        toast.success("Login successful!");
         router.push("/side-bar/home/dashboard");
       }
     } catch (error) {
@@ -122,6 +137,15 @@ export default function LoginForm() {
           Sign Up
         </a>
       </p>
+      <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+        Forgot your password?{" "}
+        <a
+          href="/forgot-password"
+          className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+        >
+          Reset your password.
+        </a>
+      </p>      
     </form>
   );
 }

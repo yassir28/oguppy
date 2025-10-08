@@ -15,6 +15,7 @@ export default function InventoryChatbot() {
     }
   ]);
 
+  // scroll anchor
   const messagesEndRef = useRef(null);
 
   useEffect(() => {

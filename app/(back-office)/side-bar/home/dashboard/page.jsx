@@ -3,8 +3,13 @@ import SalesOverview from '@/components/dashboard/SalesOverview'
 import React from 'react'
 import CurrentStock from '@/components/dashboard/CurrentStock'
 import { getData } from '@/lib/getData'
+import { requireAuthServer } from '@/lib/auth/serverPageProtection'
 
 export default async function Dashboard() {
+  // Check authentication on the server
+  // This will redirect to /login if not authenticated
+  await requireAuthServer();
+
   const items = await getData("items")
   const warehouses = await getData("warehouse")
 

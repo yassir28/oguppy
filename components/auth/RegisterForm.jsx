@@ -17,9 +17,9 @@ export default function RegisterForm() {
   console.log(emailErr);
   async function onSubmit(data) {
     try {
-      const baseUrl =process.env.NEXT_PUBLIC_BASE_URL
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
       setLoading(true);
-      const response = await fetch(`${baseUrl}/api/user`, {
+      const response = await fetch(`${baseUrl}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -31,9 +31,24 @@ export default function RegisterForm() {
 
       if (response.ok) {
         setLoading(false);
-        toast.success("User Created Successfully");
-        reset();
-        router.push("/login");
+        
+        // Check if email verification is required
+        if (responseData.requiresVerification) {
+          // Check if this was a resend (user already existed but not verified)
+          if (responseData.isResend) {
+            toast.success("Verification email resent! Check your inbox.");
+          } else {
+            toast.success("Registration successful! Check your email for verification code.");
+          }
+          reset();
+          // Redirect to verification page with email parameter
+          router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
+        } else {
+          // Old flow - direct login (for admin created users)
+          toast.success("User Created Successfully");
+          reset();
+          router.push("/login");
+        }
       } else {
         setLoading(false);
         if (response.status === 409) {
@@ -51,7 +66,7 @@ export default function RegisterForm() {
       toast.error("Something went wrong, Please try again.");
     }
   }
-
+  
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
