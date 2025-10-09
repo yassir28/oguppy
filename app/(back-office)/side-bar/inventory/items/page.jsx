@@ -21,7 +21,6 @@ export default async function Items() {
   
 
   const items = await getData("items")
-  console.log('Items data:', items) // Add this line
 
   const columns =["imageUrl","title", "category.title", "warehouse.title",  "quantity"]
   return (

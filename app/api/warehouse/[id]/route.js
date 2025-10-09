@@ -33,6 +33,9 @@ export async function PUT(request, {params}) {
                 title, location, warehouseType
             }
         });
+        // ✅ Reindex all items in this category (title might have changed)
+        await reindexItemsByRelation('warehouseId', id);
+
         return NextResponse.json(warehouse)
     }
     catch (error){

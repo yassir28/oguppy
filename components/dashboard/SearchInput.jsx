@@ -1,31 +1,214 @@
-import { Search } from 'lucide-react'
-import React from 'react'
+"use client"
+
+import { Search, X, Loader2 } from 'lucide-react'
+import React, { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function SearchInput() {
-  return (
-        <form className='hidden md:block'> 
-              <label htmlFor="simple-search" className="sr-only">Search</label>
-              <div className="relative w-full">
-                  <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                     <Search className='w-4 h-4 text-gray-500 dark:text-gray-400'/>
-                  </div>
-                  <input 
-                    type="text" 
-                    id="simple-search" 
-                    className="bg-gray-50 border 
-                    border-gray-300 
-                    text-gray-900 
-                    text-sm 
-                    rounded-lg 
-                    focus:ring-blue-500 
-                    focus:border-blue-500 
-                    block w-full pl-10 px-2 py-1.5  
-                    dark:bg-gray-700 dark:border-gray-600 
-                    dark:placeholder-gray-400 dark:text-white 
-                    dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-                    placeholder="Search in Customers..." required />
-              </div>
-        </form>    
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState([])
+  const [isOpen, setIsOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [facets, setFacets] = useState(null)
+  const searchRef = useRef(null)
+  const router = useRouter()
 
-)
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Debounced search
+  useEffect(() => {
+    const delaySearch = setTimeout(() => {
+      if (query.trim()) {
+        performSearch(query)
+      } else {
+        setResults([])
+        setIsOpen(false)
+      }
+    }, 300)
+
+    return () => clearTimeout(delaySearch)
+  }, [query])
+
+  async function performSearch(searchTerm) {
+    setIsLoading(true)
+    try {
+      const response = await fetch(`/api/search?q=${encodeURIComponent(searchTerm)}&size=10`)
+      const data = await response.json()
+      
+      if (data.success) {
+        setResults(data.results)
+        setFacets(data.facets)
+        setIsOpen(true)
+      }
+    } catch (error) {
+      console.error('Search error:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault()
+    if (query.trim()) {
+      router.push(`/side-bar/inventory/items?search=${encodeURIComponent(query)}`)
+      setIsOpen(false)
+    }
+  }
+
+  function handleClear() {
+    setQuery('')
+    setResults([])
+    setIsOpen(false)
+  }
+
+  function handleResultClick(itemId) {
+    router.push(`/side-bar/inventory/items/update/${itemId}`)
+    setIsOpen(false)
+    setQuery('')
+  }
+
+  return (
+    <div className='hidden md:block relative' ref={searchRef}>
+      <form onSubmit={handleSubmit}> 
+        <label htmlFor="simple-search" className="sr-only">Search</label>
+        <div className="relative w-full">
+          {/* Search Icon */}
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            {isLoading ? (
+              <Loader2 className='w-4 h-4 text-gray-500 dark:text-gray-400 animate-spin'/>
+            ) : (
+              <Search className='w-4 h-4 text-gray-500 dark:text-gray-400'/>
+            )}
+          </div>
+
+          {/* Input Field */}
+          <input 
+            type="text" 
+            id="simple-search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="bg-gray-50 border 
+            border-gray-300 
+            text-gray-900 
+            text-sm 
+            rounded-lg 
+            focus:ring-blue-500 
+            focus:border-blue-500 
+            block w-full pl-10 pr-10 px-2 py-1.5  
+            dark:bg-gray-700 dark:border-gray-600 
+            dark:placeholder-gray-400 dark:text-white 
+            dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+            placeholder="Search items..." 
+          />
+
+          {/* Clear Button */}
+          {query && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="absolute inset-y-0 end-0 flex items-center pe-3 hover:text-gray-700"
+            >
+              <X className='w-4 h-4 text-gray-500 dark:text-gray-400'/>
+            </button>
+          )}
+        </div>
+      </form>
+
+      {/* Search Results Dropdown */}
+      {isOpen && results.length > 0 && (
+        <div className="absolute z-50 w-full md:w-96 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-96 overflow-y-auto">
+          {/* Results Header */}
+          <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Found {results.length} items
+            </p>
+          </div>
+
+          {/* Results List */}
+          <div className="py-2">
+            {results.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => handleResultClick(item.id)}
+                className="w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 text-left transition-colors"
+              >
+                {/* Item Image - Same pattern as ImageInput */}
+                {item.imageUrl ? (
+                  <img
+                    src={item.imageUrl}
+                    alt={item.title}
+                    className="w-10 h-10 object-cover rounded border"
+                  />
+                ) : (
+                  <div className="w-10 h-10 bg-gray-200 dark:bg-gray-600 rounded flex items-center justify-center border">
+                    <Search className="w-5 h-5 text-gray-400" />
+                  </div>
+                )}
+
+                {/* Item Info */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    {item.title}
+                  </p>
+                  <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                    <span>SKU: {item.sku}</span>
+                    <span>•</span>
+                    <span className={item.quantity > 0 ? 'text-green-600' : 'text-red-600'}>
+                      Qty: {item.quantity}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Price */}
+                <div className="text-sm font-semibold text-gray-900 dark:text-white">
+                  ${item.sellingPrice}
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* View All Results Footer */}
+          <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700">
+            <button
+              onClick={handleSubmit}
+              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              View all results for "{query}"
+            </button>
+          </div>
+
+          {/* Facets Summary */}
+          {facets && (
+            <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+              <div className="flex flex-wrap gap-2 text-xs text-gray-600 dark:text-gray-400">
+                <span>Categories: {facets.categories.length}</span>
+                <span>•</span>
+                <span>Brands: {facets.brands.length}</span>
+                <span>•</span>
+                <span>Price: ${facets.priceRange.min} - ${facets.priceRange.max}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* No Results */}
+      {isOpen && query && results.length === 0 && !isLoading && (
+        <div className="absolute z-50 w-full md:w-96 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+            No items found for "{query}"
+          </p>
+        </div>
+      )}
+    </div>
+  )
 }

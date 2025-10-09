@@ -1,4 +1,5 @@
 import { requireAdmin, requireAuth } from "@/lib/auth/apiAuthMiddleware";
+import { indexItem } from "@/lib/elasticsearch/syncHelpers";
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -83,6 +84,8 @@ export async function POST(request) {
         notes: notes,
             }
        });
+      // ✅ Index to Elasticsearch after creating
+      await indexItem(item.id);
 
         console.log(`Item created by ADMIN: ${session.user.email}`);
         return NextResponse.json(item)
@@ -185,7 +188,11 @@ export async function DELETE(request) {
                 }
             }
         });
-    console.log(`Item deleted by ADMIN: ${session.user.email}`);
+
+        // ✅ Remove from Elasticsearch after deleting
+        await deleteItemFromIndex(id);
+                
+        console.log(`Item deleted by ADMIN: ${session.user.email}`);
 
         return NextResponse.json(deletedItem);
     }

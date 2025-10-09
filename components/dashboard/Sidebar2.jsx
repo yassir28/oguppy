@@ -120,7 +120,8 @@ export default function Sidebar2({showSidebar, setShowSidebar}) {
                 {/* Top Part - Fixed header 
                 lg:translate-x-0
                 */}
-                <div className="flex-shrink-0 flex justify-between border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+                <div className="flex-shrink-0 flex justify-between border-b border-gray-200 dark:border-gray-700 bg-white 
+                                dark:bg-gray-900">
                     <Link href="#" className="flex space-x-2 items-center py-3 px-2 w-full">
                         <ShoppingCart/>
                         <span className='text-xl font-semibold'>Inventory</span>
@@ -138,32 +139,66 @@ export default function Sidebar2({showSidebar, setShowSidebar}) {
                     <ul className="space-y-2 font-medium">
                         {/* Home - visible to all */}
                         <li>
-                            <Link href="/side-bar/home/dashboard" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                                <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 42 42">
-                                    <path d="M2.68 15.726c-.1.039-.16.09-.18.149l.18-.149zm-.18.149v20.627c0 2.509.49 2.998 3 2.998h7c2.51 0 3-.461 3-3v-8h9v8.031c0 2.51.51 2.979 3 2.969c.04.031 7 0 7 0c2.529 0 3-.526 3-2.997V16.495c0-.08-.09-.15-.27-.23L20 1.5L2.68 15.726l-.18.149z"/>
+                            <Link href="/side-bar/home/dashboard" 
+                                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white 
+                                                hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                                <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 
+                                                group-hover:text-gray-900 dark:group-hover:text-white" 
+                                      aria-hidden="true" 
+                                      xmlns="http://www.w3.org/2000/svg" 
+                                      fill="currentColor" 
+                                      viewBox="0 0 42 42">
+                                    <path d="M2.68 15.726c-.1.039-.16.09-.18.149l.18-.149zm-.18.149v20.627c0 2.509.49 
+                                            2.998 3 2.998h7c2.51 0 3-.461 3-3v-8h9v8.031c0 2.51.51 2.979 3 2.969c.04.031 
+                                            7 0 7 0c2.529 0 3-.526 3-2.997V16.495c0-.08-.09-.15-.27-.23L20 1.5L2.68 
+                                            15.726l-.18.149z"/>
                                 </svg>
                                 <span className="ms-3">Home</span>
                             </Link>
                         </li>
 
                         {/* Inventory - visible to all */}
-                        <SideDropDown title="Inventory" items={inventoryLinks} 
-                        setShowSidebar={setShowSidebar} 
-                        svgPath="m15.5 19.925l-4.25-4.25l1.4-1.4l2.85 2.85l5.65-5.65l1.4 1.4l-7.05 7.05ZM21 10h-2V5h-2v3H7V5H5v14h6v2H5q-.825 0-1.413-.588T3 19V5q0-.825.588-1.413T5 3h4.175q.275-.875 1.075-1.438T12 1q1 0 1.788.563T14.85 3H19q.825 0 1.413.588T21 5v5Zm-9-5q.425 0 .713-.288T13 4q0-.425-.288-.713T12 3q-.425 0-.713.288T11 4q0 .425.288.713T12 5Z" 
-                        viewBox="0 0 24 24"/>
+                        <SideDropDown title="Inventory" 
+                                        items={inventoryLinks} 
+                                        setShowSidebar={setShowSidebar} 
+                                        svgPath="m15.5 19.925l-4.25-4.25l1.4-1.4l2.85 2.85l5.65-5.65l1.4 1.4l-7.05 
+                                                7.05ZM21 10h-2V5h-2v3H7V5H5v14h6v2H5q-.825 0-1.413-.588T3 19V5q0-.825.588-1.413T5 
+                                                3h4.175q.275-.875 1.075-1.438T12 1q1 0 1.788.563T14.85 3H19q.825 0 1.413.588T21 
+                                                5v5Zm-9-5q.425 0 .713-.288T13 4q0-.425-.288-.713T12 3q-.425 0-.713.288T11 4q0 
+                                                .425.288.713T12 5Z" 
+                                        viewBox="0 0 24 24"/>
 
                         {/* Sales - different links based on role  */}
                         <SideDropDown title="Sales" items={salesLinks} 
-                        setShowSidebar={setShowSidebar}
-                        svgPath="M998 1023h-64q-14 0-25-9.5T895 991l-44-224H467l44 224q3 13-4.5 22.5T485 1023h-64q-13 0-24-9.5T383 991L193 32q-3-14 4.5-23T219 0h586q12 0 19 7.5t7 18.5q0 1 1 2.5t1 2.5l190 960q3 13-4.5 22.5T998 1023zM576 319q-49 0-88.5-18.5T448 255q0-26 25.5-45t70.5-19q48 0 60 4t36 28q4 5 9 14t10 13.5t13 4.5q14 0 24.5-9.5T704 223q-12-49-36.5-68.5T576 127q0-17-.5-25.5t-3.5-19t-10-15t-18-4.5t-18 5t-10 16t-3.5 19.5t-.5 23.5q-71 9-99.5 34.5T384 255t52.5 98T576 383q49 0 88.5 19t39.5 45t-25.5 45t-70.5 19q-48 0-60-4t-36-28q-4-4-9-13t-10-14t-13-5q-14 0-24.5 10t-7.5 22q12 50 36.5 69.5T576 575q0 18 .5 26t3.5 18.5t9.5 15t18 4.5t18.5-5t10-16t3.5-19t.5-24q71-8 99.5-33.5T768 447q0-67-52.5-97.5T576 319zM173 767l-44 224q-3 13-14 22.5t-25 9.5H26q-13 0-20.5-9.5T1 991l159-803l115 579H173zm500 64l-32 160q-3 13-14 22.5t-24 9.5h-28l-37-159l7-33h128z"
-                        viewBox="0 0 1024 1023"
+                                        setShowSidebar={setShowSidebar}
+                                        svgPath="M998 1023h-64q-14 0-25-9.5T895 991l-44-224H467l44 224q3 13-4.5 
+                                                22.5T485 1023h-64q-13 0-24-9.5T383 991L193 32q-3-14 4.5-23T219 
+                                                0h586q12 0 19 7.5t7 18.5q0 1 1 2.5t1 2.5l190 960q3 13-4.5 22.5T998 
+                                                1023zM576 319q-49 0-88.5-18.5T448 255q0-26 25.5-45t70.5-19q48 0 60 
+                                                4t36 28q4 5 9 14t10 13.5t13 4.5q14 0 24.5-9.5T704 223q-12-49-36.5-68.5T576 
+                                                127q0-17-.5-25.5t-3.5-19t-10-15t-18-4.5t-18 5t-10 16t-3.5 19.5t-.5 23.5q-71 
+                                                9-99.5 34.5T384 255t52.5 98T576 383q49 0 88.5 19t39.5 45t-25.5 45t-70.5 19q-48 
+                                                0-60-4t-36-28q-4-4-9-13t-10-14t-13-5q-14 0-24.5 10t-7.5 22q12 50 36.5 69.5T576 
+                                                575q0 18 .5 26t3.5 18.5t9.5 15t18 4.5t18.5-5t10-16t3.5-19t.5-24q71-8 99.5-33.5T768 
+                                                447q0-67-52.5-97.5T576 319zM173 767l-44 224q-3 13-14 22.5t-25 9.5H26q-13 
+                                                0-20.5-9.5T1 991l159-803l115 579H173zm500 64l-32 160q-3 13-14 22.5t-24 
+                                                9.5h-28l-37-159l7-33h128z"
+                                        viewBox="0 0 1024 1023"
                         />
 
                         {/* Collections - different links based on role  */}
-                        <SideDropDown title="Collections" items={salesLinks} 
-                        setShowSidebar={setShowSidebar}
-                        svgPath="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z"
-                        viewBox="0 0 18 18"
+                        <SideDropDown title="Collections" 
+                                        items={salesLinks} 
+                                        setShowSidebar={setShowSidebar}
+                                        svgPath="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 
+                                        8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 
+                                        0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857
+                                         1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 
+                                         0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 
+                                         16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 
+                                         11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 
+                                         16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z"
+                                        viewBox="0 0 18 18"
                         />
 
                         {/* Purchases - ADMIN only */}

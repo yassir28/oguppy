@@ -33,6 +33,9 @@ export async function PUT(request, {params}) {
                 title, description
             }
         });
+        // ✅ Reindex all items in this category (title might have changed)
+        await reindexItemsByRelation('categoryId', id);
+
         return NextResponse.json(category)
     }
     catch (error){

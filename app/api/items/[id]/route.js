@@ -1,4 +1,5 @@
 
+import { requireAdmin, requireAuth } from "@/lib/auth/apiAuthMiddleware";
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -56,40 +57,41 @@ export async function PUT(request, {params}) {
 
 
     try{
-        const { id } = await params;
-        const  {imageUrl,title,  sku, barcode,  qty, sellingPrice, weight,dimensions, taxRate,notes} = await request.json()
-
-
-    // Check if item exists
-    const existingItem = await prisma.item.findUnique({
-      where: { id }
-    });
-
-    if (!existingItem) {
-      return NextResponse.json({
-        message: "Item not found"
-      }, {
-        status: 404
+      const { id } = await params;
+      const  {imageUrl,title,  sku, barcode,  qty, sellingPrice, weight,dimensions, taxRate,notes} = await request.json()
+      // Check if item exists
+      const existingItem = await prisma.item.findUnique({
+        where: { id }
       });
-    }                    
-        const item =await prisma.item.update({
-            where: {
-                id
-            },
-            data:{ // db: front
-                imageUrl,
-                title: title,
-                sku: sku,
-                barcode: barcode,
-                quantity: parseInt(qty), 
-                sellingPrice: parseFloat(sellingPrice),
-                weight: weight ? parseFloat(weight) : null,
-                dimensions: dimensions,
-                taxRate: parseFloat(taxRate),
-                notes: notes,
-            }
+
+      if (!existingItem) {
+        return NextResponse.json({
+          message: "Item not found"
+        }, {
+          status: 404
         });
-        return NextResponse.json(item)
+      }                    
+      const item =await prisma.item.update({
+        where: {
+            id
+        },
+        data:{ // db: front
+            imageUrl,
+            title: title,
+            sku: sku,
+            barcode: barcode,
+            quantity: parseInt(qty), 
+            sellingPrice: parseFloat(sellingPrice),
+            weight: weight ? parseFloat(weight) : null,
+            dimensions: dimensions,
+            taxRate: parseFloat(taxRate),
+            notes: notes,
+        }
+      });
+      // ✅ Reindex to Elasticsearch after updating
+      await indexItem(item.id);
+      
+      return NextResponse.json(item)
     }
     catch (error){
         console.log(error)

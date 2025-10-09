@@ -1,3 +1,4 @@
+import { reindexItemsByRelation } from "@/lib/elasticsearch/syncHelpers";
 import { NextResponse } from "next/server";
 
 export async function GET(request, {params}) {
@@ -33,6 +34,9 @@ export async function PUT(request, {params}) {
                 title
             }
         });
+        // ✅ Reindex all items in this category (title might have changed)
+        await reindexItemsByRelation('brandId', id);
+
         return NextResponse.json(brands)
     }
     catch (error){

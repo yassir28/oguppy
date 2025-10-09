@@ -18,7 +18,7 @@ export default function HomeNavbar() {
 
     const username =session?.user?.name.toUpperCase();    
 
-    const navLinks =[
+    const NAV_LINKS  =[
         {
             title:"Dashboard",
             href:"/side-bar/home/dashboard"
@@ -36,6 +36,8 @@ export default function HomeNavbar() {
             href:"/side-bar/home/announcements"
         }
     ];
+    console.log('NavLinks:', NAV_LINKS); // Add this line before the return statement
+
   return (
     <div className='h-32 p-5 '>
         <div className="flex space-x-3">
@@ -53,7 +55,7 @@ export default function HomeNavbar() {
             <div className="text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
                 <ul className="flex flex-wrap -mb-px">
                                 {
-                            navLinks.map((item, i)=>{
+                            NAV_LINKS.map((item, i)=>{
                                 return(
                                     <li className="me-2"     key={i} >
                                         <Link 
