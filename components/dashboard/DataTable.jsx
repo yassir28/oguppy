@@ -7,7 +7,7 @@ import DeleteBtn from './DeleteBtn'
 import { useRole } from '@/lib/hooks/useRole'
 
 
-export default function DataTable({data= [], columns = [], resourceTitle}) {
+export default function DataTable({data= [], columns = [], resourceTitle, section}) {
     // Get user role information
   const { isAdmin } = useRole();
 
@@ -79,7 +79,7 @@ export default function DataTable({data= [], columns = [], resourceTitle}) {
                         {
                             resourceTitle.includes("adjustments")  ? ("") :
                             (
-                                <Link href={`/side-bar/inventory/${resourceTitle}/update/${item.id}`} 
+                                <Link href={`/side-bar/${section}/${resourceTitle}/update/${item.id}`} 
                                         className="font-medium text-blue-600 
                                                     dark:text-blue-500 hover:underline 
                                                     flex items-center space-x-2">

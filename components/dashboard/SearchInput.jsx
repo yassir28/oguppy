@@ -1,8 +1,9 @@
 "use client"
 
-import { Search, X, Loader2 } from 'lucide-react'
+import { Search, X, Loader2 , Filter } from 'lucide-react'
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import SearchInputFilter from './SearchInputFilter'
 
 export default function SearchInput() {
   const [query, setQuery] = useState('')
@@ -10,25 +11,59 @@ export default function SearchInput() {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [facets, setFacets] = useState(null)
+  const [showFilters, setShowFilters] = useState(false)
+  
+  // Filter states
+  const [filters, setFilters] = useState({
+    category: '',
+    warehouse: '',
+    brand: '',
+    minPrice: '',
+    maxPrice: '',
+    inStock: false,
+    lowStock: false
+  })
+
   const searchRef = useRef(null)
   const router = useRouter()
+  const shouldSearchRef = useRef(false) // Track if we should search after filter apply
 
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setIsOpen(false)
+        setShowFilters(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Debounced search
+  // When filters open, close results
   useEffect(() => {
+    if (showFilters) {
+      setIsOpen(false)
+    }
+  }, [showFilters])
+
+  // When results open, close filters
+  useEffect(() => {
+    if (isOpen) {
+      setShowFilters(false)
+    }
+  }, [isOpen])
+
+  // Debounced search - only for query changes, not filter changes
+  useEffect(() => {
+    // Skip this effect if we're applying filters via the button
+    if (shouldSearchRef.current) {
+      return
+    }
+
     const delaySearch = setTimeout(() => {
       if (query.trim()) {
-        performSearch(query)
+        performSearch(query, true) // true = auto-open results when typing
       } else {
         setResults([])
         setIsOpen(false)
@@ -36,23 +71,41 @@ export default function SearchInput() {
     }, 300)
 
     return () => clearTimeout(delaySearch)
-  }, [query])
+  }, [query]) // Removed filters from dependency array
 
-  async function performSearch(searchTerm) {
+  async function performSearch(searchTerm, shouldOpenResults = true) {
     setIsLoading(true)
     try {
-      const response = await fetch(`/api/search?q=${encodeURIComponent(searchTerm)}&size=10`)
+      // Build query params with filters
+      const params = new URLSearchParams({
+        q: searchTerm || '',
+        size: '10'
+      })
+
+      // Add filters if they have values
+      if (filters.category) params.append('category', filters.category)
+      if (filters.warehouse) params.append('warehouse', filters.warehouse)
+      if (filters.brand) params.append('brand', filters.brand)
+      if (filters.minPrice) params.append('minPrice', filters.minPrice)
+      if (filters.maxPrice) params.append('maxPrice', filters.maxPrice)
+      if (filters.inStock) params.append('inStock', 'true')
+      if (filters.lowStock) params.append('lowStock', 'true')
+
+      const response = await fetch(`/api/search?${params.toString()}`)
       const data = await response.json()
       
       if (data.success) {
         setResults(data.results)
         setFacets(data.facets)
-        setIsOpen(true)
+        if (shouldOpenResults) {
+          setIsOpen(true)
+        }
       }
     } catch (error) {
       console.error('Search error:', error)
     } finally {
       setIsLoading(false)
+      shouldSearchRef.current = false // Reset flag
     }
   }
 
@@ -68,6 +121,15 @@ export default function SearchInput() {
     setQuery('')
     setResults([])
     setIsOpen(false)
+    setFilters({
+      category: '',
+      warehouse: '',
+      brand: '',
+      minPrice: '',
+      maxPrice: '',
+      inStock: false,
+      lowStock: false
+    })
   }
 
   function handleResultClick(itemId) {
@@ -75,6 +137,25 @@ export default function SearchInput() {
     setIsOpen(false)
     setQuery('')
   }
+
+  function handleFilterChange(key, value) {
+    setFilters(prev => ({ ...prev, [key]: value }))
+  }
+
+  // Function to apply filters and trigger search
+  async function handleApplyFilters() {
+    shouldSearchRef.current = true // Set flag to skip the useEffect
+    setShowFilters(false)
+    
+    // Perform search with current query and filters
+    await performSearch(query || '', true) // true = open results after search
+  }
+
+  // Count active filters
+  const activeFilterCount = Object.entries(filters).filter(([key, value]) => {
+    if (typeof value === 'boolean') return value === true
+    return value !== '' && value !== null
+  }).length
 
   return (
     <div className='hidden md:block relative' ref={searchRef}>
@@ -110,30 +191,62 @@ export default function SearchInput() {
             placeholder="Search items..." 
           />
 
-          {/* Clear Button */}
-          {query && (
+          {/* Filter & Clear Buttons */}
+          <div className="absolute inset-y-0 end-0 flex items-center gap-1 pe-2">
+            {/* Filter Button */}
             <button
               type="button"
-              onClick={handleClear}
-              className="absolute inset-y-0 end-0 flex items-center pe-3 hover:text-gray-700"
+              onClick={() => setShowFilters(!showFilters)}
+              className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 relative transition-colors ${
+                showFilters ? 'bg-gray-200 dark:bg-gray-600' : ''
+              }`}
+              title="Filters"
             >
-              <X className='w-4 h-4 text-gray-500 dark:text-gray-400'/>
+              <Filter className='w-4 h-4 text-gray-500 dark:text-gray-400'/>
+              {activeFilterCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-600 text-white 
+                               text-xs rounded-full flex items-center justify-center font-medium">
+                  {activeFilterCount}
+                </span>
+              )}
             </button>
-          )}
+
+            {/* Clear Button */}
+            {query && (
+              <button
+                type="button"
+                onClick={handleClear}
+                className="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
+                title="Clear"
+              >
+                <X className='w-4 h-4 text-gray-500 dark:text-gray-400'/>
+              </button>
+            )}
+          </div>
         </div>
       </form>
+
+      {/* Filter Panel */}
+      {showFilters && (
+        <SearchInputFilter 
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onClearAll={handleClear}
+          onApplyFilters={handleApplyFilters}
+          facets={facets}
+        />
+      )}
 
       {/* Search Results Dropdown */}
       {isOpen && results.length > 0 && (
         <div className="absolute z-50 w-full md:w-96 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-96 overflow-y-auto">
-          {/* Results Header */}
           <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
             <p className="text-xs text-gray-500 dark:text-gray-400">
               Found {results.length} items
+              {activeFilterCount > 0 && ` (${activeFilterCount} filter${activeFilterCount > 1 ? 's' : ''} active)`}
             </p>
           </div>
 
-          {/* Results List */}
           <div className="py-2">
             {results.map((item) => (
               <button
@@ -141,7 +254,6 @@ export default function SearchInput() {
                 onClick={() => handleResultClick(item.id)}
                 className="w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 text-left transition-colors"
               >
-                {/* Item Image - Same pattern as ImageInput */}
                 {item.imageUrl ? (
                   <img
                     src={item.imageUrl}
@@ -154,7 +266,6 @@ export default function SearchInput() {
                   </div>
                 )}
 
-                {/* Item Info */}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                     {item.title}
@@ -168,7 +279,6 @@ export default function SearchInput() {
                   </div>
                 </div>
 
-                {/* Price */}
                 <div className="text-sm font-semibold text-gray-900 dark:text-white">
                   ${item.sellingPrice}
                 </div>
@@ -176,7 +286,6 @@ export default function SearchInput() {
             ))}
           </div>
 
-          {/* View All Results Footer */}
           <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700">
             <button
               onClick={handleSubmit}
@@ -186,7 +295,6 @@ export default function SearchInput() {
             </button>
           </div>
 
-          {/* Facets Summary */}
           {facets && (
             <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
               <div className="flex flex-wrap gap-2 text-xs text-gray-600 dark:text-gray-400">
@@ -201,12 +309,20 @@ export default function SearchInput() {
         </div>
       )}
 
-      {/* No Results */}
+      {/* No results now suggests clearing filters */}
       {isOpen && query && results.length === 0 && !isLoading && (
         <div className="absolute z-50 w-full md:w-96 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4">
           <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
             No items found for "{query}"
           </p>
+          {activeFilterCount > 0 && (
+            <button
+              onClick={handleClear}
+              className="mt-2 w-full text-sm text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              Clear filters to see more results
+            </button>
+          )}
         </div>
       )}
     </div>

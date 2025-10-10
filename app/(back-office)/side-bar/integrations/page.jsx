@@ -4,8 +4,7 @@ export default function integrations
 () {
   return (
     <div> 
-        <h2>integrations</h2>
-
+      integrations
     </div>
   )
 }
