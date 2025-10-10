@@ -8,8 +8,6 @@ export async function PUT(request, { params }) {
   const { session, error } = await requireAuth(request);
   if (error) return error;
 
-
-
   try {
     const { id } = await params;
     const { name, email, phone, address, taxId, notes } = await request.json();
@@ -60,7 +58,7 @@ export async function PUT(request, { params }) {
 export async function GET(request, {params}) {
     try{
         const { id } = await params;
-        const customer =await prisma.brand.findUnique({
+        const customer =await prisma.customer.findUnique({
             where: {
                 id
             },
@@ -77,3 +75,5 @@ export async function GET(request, {params}) {
         })
     }
 }
+
+

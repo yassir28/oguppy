@@ -5,10 +5,6 @@ import { NextResponse } from "next/server";
 /**
  * GET - Fetch a single customer by ID
  */
-
-
-
-
 export async function GET(request, { params }) {
   const { session, error } = await requireAuth(request);
   if (error) return error;
@@ -83,4 +79,57 @@ export async function POST(request) {
             status:500
         })
     }
+}
+
+
+
+/**
+ * DELETE - Delete a customer
+ * ⚠️ This was missing!
+ */
+export async function DELETE(request) {
+  const { session, error } = await requireAuth(request);
+  if (error) return error;
+
+  try {
+    const id = request.nextUrl.searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json({
+        message: "Customer ID is required"
+      }, {
+        status: 400
+      });
+    }
+
+    // Check if customer exists
+    const existingCustomer = await prisma.customer.findUnique({
+      where: { id }
+    });
+
+    if (!existingCustomer) {
+      return NextResponse.json({
+        message: "Customer not found"
+      }, {
+        status: 404
+      });
+    }
+
+    // Delete the customer
+    const deletedCustomer = await prisma.customer.delete({
+      where: { id }
+    });
+
+    console.log(`Customer deleted: ${deletedCustomer.email}`);
+    return NextResponse.json(deletedCustomer);
+
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json({
+      error: error.message,
+      message: "Failed to delete the customer"
+    }, {
+      status: 500
+    });
+  }
 }

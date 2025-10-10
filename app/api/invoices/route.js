@@ -11,53 +11,51 @@ export async function GET(request, { params }) {
 
   try {
     const { id } = await params;
-    const invoice = await prisma.invoice.findUnique({
+    const invoices = await prisma.invoice.findMany({
       where: { id },
-      include: {
-        customer: true,
-        items: {
-          include: {
-            item: true
-          }
-        }
-      }
+      orderBy: {
+          createdAt: 'desc'
+      },
     });
-
-    if (!invoice) {
-      return NextResponse.json({
-        message: "Invoice not found"
-      }, {
-        status: 404
-      });
-    }
-
-    return NextResponse.json(invoice);
+    return NextResponse.json(invoices);
   } catch (error) {
     console.log(error);
     return NextResponse.json({
       error: error.message,
-      message: "Failed to fetch invoice"
+      message: "Failed to fetch invoices"
     }, {
       status: 500
     });
   }
 }
 
+
+
+
+
+
 /**
- * PUT - Update an invoice
+ * DELETE - Delete a invoice
+ * ⚠️ This was missing!
  */
-export async function PUT(request, { params }) {
+export async function DELETE(request) {
   const { session, error } = await requireAuth(request);
   if (error) return error;
 
   try {
-    const { id } = await params;
-    const data = await request.json();
+    const id = request.nextUrl.searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json({
+        message: "Invoice ID is required"
+      }, {
+        status: 400
+      });
+    }
 
     // Check if invoice exists
     const existingInvoice = await prisma.invoice.findUnique({
-      where: { id },
-      include: { items: true }
+      where: { id }
     });
 
     if (!existingInvoice) {
@@ -68,50 +66,84 @@ export async function PUT(request, { params }) {
       });
     }
 
-    // Delete old invoice items
-    await prisma.invoiceItem.deleteMany({
-      where: { invoiceId: id }
+    // Delete the invoice
+    const deletedInvoice = await prisma.invoice.delete({
+      where: { id }
     });
 
-    // Update invoice with new items
-    const invoice = await prisma.invoice.update({
-      where: { id },
-      data: {
-        invoiceNumber: data.invoiceNumber,
-        customerId: data.customerId,
-        invoiceDate: new Date(data.invoiceDate),
-        dueDate: new Date(data.dueDate),
-        subtotal: data.subtotal,
-        taxRate: data.taxRate,
-        taxAmount: data.taxAmount,
-        discount: data.discount,
-        discountAmount: data.discountAmount,
-        total: data.total,
-        notes: data.notes,
-        items: {
-          create: data.items.map(item => ({
-            itemId: item.itemId || null,
-            description: item.description,
-            quantity: parseInt(item.quantity),
-            unitPrice: parseFloat(item.unitPrice),
-            total: parseInt(item.quantity) * parseFloat(item.unitPrice)
-          }))
-        }
-      },
-      include: {
-        customer: true,
-        items: true
-      }
-    });
+    console.log(`Invoice deleted: ${deletedInvoice.email}`);
+    return NextResponse.json(deletedInvoice);
 
-    return NextResponse.json(invoice);
   } catch (error) {
     console.log(error);
     return NextResponse.json({
       error: error.message,
-      message: "Failed to update invoice"
+      message: "Failed to delete the invoice"
     }, {
       status: 500
     });
   }
+}
+
+
+
+
+
+/**
+ * POST - Update a invoice
+ */
+
+export async function POST(request) {
+    try{
+        const body = await request.json();
+        const {
+              invoiceNumber,
+              customerId,
+              invoiceDate,
+              dueDate,
+              subtotal,
+              taxRate,
+              taxAmount,
+              discount,
+              discountAmount,
+              total,
+              notes
+        } = body;
+        
+        const  invoice = await prisma.invoice.create({
+        data:{
+              invoiceNumber,
+              customerId,
+              invoiceDate: new Date(invoiceDate), // ✅ Converts string to Date object
+              dueDate: new Date(dueDate),         // ✅ Converts string to Date object
+              subtotal: parseFloat(subtotal),
+              taxRate: parseFloat(taxRate) || 0,
+              taxAmount: parseFloat(taxAmount) || 0,
+              discount: parseFloat(discount) || 0,
+              discountAmount: parseFloat(discountAmount) || 0,
+              total: parseFloat(total),
+              status: "DRAFT", // Default status
+              notes: notes || null,
+            },
+            include: {
+              customer: true,
+              items: {
+                include: {
+                  item: true
+                }
+              }
+            }
+          });
+
+        return NextResponse.json(invoice)
+    }
+    catch (error){
+        console.log(error)
+        return NextResponse.json({
+            error,
+            message:"Failed to create a invoice"
+        },{
+            status:500
+        })
+    }
 }

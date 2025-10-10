@@ -1,43 +1,16 @@
 //Create, Manage and Track invoices and download as pdf, email
 
-"use client"
 
 import FixedHeader from '@/components/dashboard/FixedHeader'
 import DataTable from '@/components/dashboard/DataTable'
-import { useState, useEffect } from 'react'
 import { FileText } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { getData } from '@/lib/getData';
 
-export default function Invoices() {
-  const [invoices, setInvoices] = useState([]);
+export default async function Invoices() {
   
   
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  async function fetchData() {
-    try {
-      const [invoicesRes, customersRes] = await Promise.all([
-        fetch('/api/invoices'),
-        fetch('/api/customers')
-      ]);
-      
-      const invoicesData = await invoicesRes.json();
-      const customersData = await customersRes.json();
-      
-      setInvoices(Array.isArray(invoicesData) ? invoicesData : []);
-      setCustomers(Array.isArray(customersData) ? customersData : []);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      toast.error('Failed to load data');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-
+  const invoices = await getData("invoices")
+  
   const invoiceColumns = ["invoiceNumber", "customer.name", "total", "status", "dueDate"];
 
 
@@ -54,7 +27,7 @@ export default function Invoices() {
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No invoices yet</h3>
             <p className="text-gray-600 mb-4">Create your first invoice to get started</p>
             <a 
-              href="/side-bar/documents/invoices/new"
+              href="/side-bar/sales/invoices/new"
               className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
             >
               Create Invoice
@@ -65,6 +38,8 @@ export default function Invoices() {
             data={invoices} 
             columns={invoiceColumns} 
             resourceTitle="invoices"
+            section="sales"
+
           />
         )}
       </div>     
