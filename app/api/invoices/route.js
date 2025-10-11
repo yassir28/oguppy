@@ -5,21 +5,29 @@ import { NextResponse } from "next/server";
 /**
  * GET - Fetch a single invoice by ID
  */
-export async function GET(request, { params }) {
+export async function GET(request) {
   const { session, error } = await requireAuth(request);
   if (error) return error;
 
   try {
-    const { id } = await params;
+    // ✅ Fetch ALL invoices with related data
     const invoices = await prisma.invoice.findMany({
-      where: { id },
       orderBy: {
-          createdAt: 'desc'
+        createdAt: 'desc'
       },
+      include: {
+        customer: true,
+        items: {
+          include: {
+            item: true
+          }
+        }
+      }
     });
+    
     return NextResponse.json(invoices);
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching invoices:", error);
     return NextResponse.json({
       error: error.message,
       message: "Failed to fetch invoices"
