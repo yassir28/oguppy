@@ -34,3 +34,97 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+
+
+
+## Maiin headline: "Your Complete School Management Solution"
+Subheadline: "From admissions to Acadimics, simplify every aspect of school administration with our comprehensive and user-friendly platform." Buttons: "Get trated free" | "View Features   "
+
+School management system structure
+## Part 1: core software Modules and functionalities
+
+### 1. Student Management Module
+- Student Registration 6 Enrollment
+- Student Profiles 6 Records
+- Academic History
+- Health Records
+- Emergency Contacts
+- Document Management
+- Student Performance Analytics
+- Behavioral Records
+
+### 2. Academic Management Module
+- Curriculum Planning
+- CLass Scheduling 6 Timetables
+- Attendance Tracking
+- Examination Management
+- Grading System
+- Report Card Generation
+- Assignement Management
+- Online Assessement Tools
+- Academic Calendar
+
+### 3. Staff Management Module
+- Staff Profiles 6 Records
+- Attendance Tracking 
+- Performance Evaluation
+- Leave Management
+- Document Management
+- Payrooll Integration
+- Professional Developement
+- Substitute Management
+
+### 4. Communication Module
+- Multi-Channel Messaging
+- Email 6 SMS Integration
+- Push Notifications
+- Digital Notice Board
+- Parent-Teacher Communication
+- Event Announcements
+- Emergency Alerts
+- Document Sharing
+
+
+### 5. Financial Management Module
+- Fee Management
+- Online Payment Processing
+- Invoice Generation
+- Payment Tracking
+- Scholarship Management
+- Expense Tracking
+- Financial Reports
+- Budget Planning 
+- Payroll Processing
+
+### 6. Transport Management Module
+- Route Planning
+- GPS Tracking
+- Driver Management
+- Vehicle Maintenance 
+- Transport Attendance
+- Safety Alerts
+- Parents Notification
+- ROute optimization
+
+### 7. Resource Management Module
+- Library Management
+- Inventory Control
+- Facility Scheduling
+- Asset Tracking
+- Resource Allocation
+- Maintenace Scheduling
+- Resource Booking
+- Usage Analytics
+
+
+### 8. Analytics 6 Reporting Module
+- Performace Analytics 
+- Attendance Reports
+- Financial Analytics 
+- Custom Report Builder
+- Data Visualization
+- Compliance Reports
+- Trend Analytics
+- Decision Support
